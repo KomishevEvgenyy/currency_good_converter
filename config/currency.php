@@ -38,6 +38,11 @@ return [
         'key_prefix' => 'currency:rates',
     ],
 
+    'http' => [
+        'connect_timeout_seconds' => 3,
+        'timeout_seconds' => 3,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Provider registry

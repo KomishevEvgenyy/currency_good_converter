@@ -14,8 +14,8 @@ class TrackCatalogCurrencyUsageJob implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public string $currencyCode,
-        public Carbon $requestedAt,
+        public readonly string $currencyCode,
+        public readonly Carbon $requestedAt,
     ) {}
 
     public function handle(): void

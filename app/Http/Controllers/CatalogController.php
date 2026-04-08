@@ -17,15 +17,14 @@ class CatalogController extends Controller
 
     public function __invoke(CatalogRequest $request): AnonymousResourceCollection|JsonResponse
     {
-        $currency = $request->route('currency');
-        $lowerCurrency = strtolower($currency);
+        $currencyCode = strtolower((string) $request->route('currency'));
 
         TrackCatalogCurrencyUsageJob::dispatch(
-            strtoupper((string) $lowerCurrency),
+            strtoupper($currencyCode),
             now(),
         );
 
-        $products = $this->catalogService->getProducts($lowerCurrency);
+        $products = $this->catalogService->getProducts($currencyCode);
 
         return CatalogResource::collection($products);
     }

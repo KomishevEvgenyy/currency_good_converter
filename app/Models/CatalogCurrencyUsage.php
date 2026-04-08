@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $currency_code
- * @property \DateTimeInterface $requested_at
+ * @property Carbon $requested_at
  */
 class CatalogCurrencyUsage extends Model
 {

@@ -8,14 +8,14 @@ use Modules\Currency\Domain\CurrencyRate;
 
 readonly class NbuApiCurrencyRepository implements CurrencyRateReader
 {
-    private const int TIMEOUT_SECONDS = 3;
-
     /**
      * @return CurrencyRate[]
      */
     public function getAll(): array
     {
-        $response = Http::timeout(self::TIMEOUT_SECONDS)
+        $response = Http::connectTimeout((int) config('currency.http.connect_timeout_seconds', 3))
+            ->timeout((int) config('currency.http.timeout_seconds', 3))
+            ->acceptJson()
             ->get(config('currency.urls.nbu'), ['json' => ''])
             ->throw();
 

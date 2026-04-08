@@ -2,22 +2,22 @@
 
 namespace Modules\Currency\Infrastructure;
 
-use Modules\Currency\Enum\CurrencyTypeEnum;
 use Illuminate\Support\Facades\Http;
 use Modules\Currency\Domain\Contracts\CurrencyRateReader;
 use Modules\Currency\Domain\CurrencyRate;
+use Modules\Currency\Enum\CurrencyTypeEnum;
 
 readonly class ErApiCurrencyRepository implements CurrencyRateReader
 {
-    private const int TIMEOUT_SECONDS = 3;
-
     /**
      * @return CurrencyRate[]
      */
     public function getAll(): array
     {
         $url = config('currency.urls.er_api') . '/' . CurrencyTypeEnum::UAH->upper();
-        $response = Http::timeout(self::TIMEOUT_SECONDS)
+        $response = Http::connectTimeout((int) config('currency.http.connect_timeout_seconds', 3))
+            ->timeout((int) config('currency.http.timeout_seconds', 3))
+            ->acceptJson()
             ->get($url)
             ->throw();
 
