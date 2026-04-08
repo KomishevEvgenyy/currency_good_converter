@@ -4,12 +4,14 @@ namespace App\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use App\Services\Mappers\DummyJsonProductMapper;
 use Modules\Currency\Application\Facades\CurrencyExchangeFacade;
 
 final readonly class CatalogService
 {
     public function __construct(
         private CurrencyExchangeFacade $currencyExchange,
+        private DummyJsonProductMapper $productMapper,
     ) {}
 
     /**
@@ -24,8 +26,7 @@ final readonly class CatalogService
             ])
             ->throw();
 
-        /** @var list<array{id: int, title: string, price: numeric, rating: numeric, thumbnail: string}> $products */
-        $products = $response->json('products', []);
+        $products = $this->productMapper->mapProducts($response->json());
 
         return collect($products)->map(function (array $product) use ($currencyCode): object {
             $price = $this->currencyExchange->catalogPriceInCurrency(
