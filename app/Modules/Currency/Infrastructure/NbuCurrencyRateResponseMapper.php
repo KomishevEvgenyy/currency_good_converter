@@ -15,6 +15,10 @@ final class NbuCurrencyRateResponseMapper
             throw new \RuntimeException('NBU API returned invalid payload: expected top-level array');
         }
 
+        if ($payload === []) {
+            throw new \RuntimeException('NBU API returned invalid payload: expected at least one rate row');
+        }
+
         return array_map(
             function (mixed $item, int|string $index): CurrencyRate {
                 if (! is_array($item)) {

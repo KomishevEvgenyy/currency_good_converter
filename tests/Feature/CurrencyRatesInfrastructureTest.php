@@ -28,10 +28,51 @@ class CurrencyRatesInfrastructureTest extends TestCase
         ];
     }
 
+    private function erRatesPayloadWithoutExchangeDate(): array
+    {
+        return [
+            'rates' => [
+                'USD' => 0.025,
+                'EUR' => 0.02,
+                'UAH' => 1,
+            ],
+        ];
+    }
+
+    private function erRatesPayloadWithInvalidUsdRate(): array
+    {
+        return [
+            'rates' => [
+                'USD' => 0,
+                'EUR' => 0.02,
+                'UAH' => 1,
+            ],
+            'time_last_update_utc' => '2026-03-02T00:00:01+0000',
+        ];
+    }
+
     public function test_fallback_uses_er_api_when_nbu_fails(): void
     {
         Http::fake([
             'bank.gov.ua/*' => Http::response([], 500),
+            'open.er-api.com/*' => Http::response($this->erRatesPayload()),
+        ]);
+
+        $response = $this->getJson('/api/exchangeRate/usd');
+
+        $response->assertOk();
+        $response->assertJson([
+            'data' => [
+                'currencyCode' => 'USD',
+                'rate' => 40.0,
+            ],
+        ]);
+    }
+
+    public function test_fallback_uses_er_api_when_nbu_returns_empty_success_payload(): void
+    {
+        Http::fake([
+            'bank.gov.ua/*' => Http::response([], 200),
             'open.er-api.com/*' => Http::response($this->erRatesPayload()),
         ]);
 
@@ -76,6 +117,50 @@ class CurrencyRatesInfrastructureTest extends TestCase
             'data' => [
                 'currencyCode' => 'USD',
                 'rate' => 40.0,
+            ],
+        ]);
+    }
+
+    public function test_fallback_uses_nbu_when_er_api_payload_is_missing_exchange_date(): void
+    {
+        Config::set('currency.primary', 'er_api');
+        Config::set('currency.fallback', 'nbu');
+
+        Http::fake([
+            'open.er-api.com/*' => Http::response($this->erRatesPayloadWithoutExchangeDate()),
+            'bank.gov.ua/*' => Http::response($this->nbuRatesPayload(43.0)),
+        ]);
+
+        $response = $this->getJson('/api/exchangeRate/usd');
+
+        $response->assertOk();
+        $response->assertJson([
+            'data' => [
+                'currencyCode' => 'USD',
+                'rate' => 43.0,
+                'exchangeDate' => '02.03.2026',
+            ],
+        ]);
+    }
+
+    public function test_fallback_uses_nbu_when_er_api_payload_contains_invalid_rate_row(): void
+    {
+        Config::set('currency.primary', 'er_api');
+        Config::set('currency.fallback', 'nbu');
+
+        Http::fake([
+            'open.er-api.com/*' => Http::response($this->erRatesPayloadWithInvalidUsdRate()),
+            'bank.gov.ua/*' => Http::response($this->nbuRatesPayload(43.0)),
+        ]);
+
+        $response = $this->getJson('/api/exchangeRate/usd');
+
+        $response->assertOk();
+        $response->assertJson([
+            'data' => [
+                'currencyCode' => 'USD',
+                'rate' => 43.0,
+                'exchangeDate' => '02.03.2026',
             ],
         ]);
     }

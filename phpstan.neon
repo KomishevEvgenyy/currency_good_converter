@@ -27,6 +27,6 @@ parameters:
         - stdClass
 
     parallel:
-        maximumNumberOfProcesses: 4
+        maximumNumberOfProcesses: 1
 
     ignoreErrors: []

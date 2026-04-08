@@ -37,6 +37,16 @@ class NbuCurrencyRateResponseMapperTest extends TestCase
         $mapper->map('invalid');
     }
 
+    public function test_it_throws_on_empty_payload(): void
+    {
+        $mapper = new NbuCurrencyRateResponseMapper();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('NBU API returned invalid payload: expected at least one rate row');
+
+        $mapper->map([]);
+    }
+
     public function test_it_throws_when_row_is_not_array(): void
     {
         $mapper = new NbuCurrencyRateResponseMapper();

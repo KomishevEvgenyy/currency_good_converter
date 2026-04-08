@@ -87,3 +87,75 @@ Avoid:
 - generic helper layers
 - “framework inside domain”
 - abstractions added only because they look clean
+
+## Integration Boundary Design
+
+External API integrations must remain explicit, readable, and testable.
+
+### Responsibility split
+
+Integration classes (e.g. repositories using HTTP APIs) must NOT combine all logic into one method.
+
+A typical flow should be:
+
+1. Perform HTTP request
+2. Validate response shape
+3. Parse and map into domain DTOs
+
+If this logic becomes non-trivial, it must be split.
+
+### When to extract a mapper/parser
+
+Extract a dedicated mapper/parser if:
+
+- payload validation is more than trivial
+- mapping logic contains conditionals or filtering
+- multiple fields require transformation
+- method readability degrades
+- method mixes validation + transformation + orchestration
+
+### Expected structure
+
+Repository:
+- performs HTTP call
+- delegates payload handling
+- returns domain objects
+
+Mapper/Parser:
+- validates payload
+- transforms data
+- throws controlled exceptions on malformed input
+
+### Fail-fast rule
+
+Integration boundaries must not:
+- silently skip invalid data
+- partially accept malformed payloads
+- fabricate missing values
+
+If payload is invalid:
+→ fail immediately with a controlled exception
+
+### Anti-patterns (must be avoided)
+
+- large “do-everything” methods (HTTP + validation + parsing + mapping)
+- `continue` on invalid payload rows instead of failing
+- mixing orchestration and transformation logic
+- hidden data normalization
+
+### Goal
+
+Keep integration logic:
+- explicit
+- predictable
+- easy to audit
+- easy to test in isolation
+
+### Method size heuristic
+
+If a method:
+- exceeds ~30–40 lines
+- contains multiple logical stages
+- mixes different responsibilities
+
+It must be reviewed for extraction.
