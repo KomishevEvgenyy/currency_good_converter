@@ -6,7 +6,6 @@ use App\Http\Requests\CatalogRequest;
 use App\Http\Resource\CatalogResource;
 use App\Jobs\TrackCatalogCurrencyUsageJob;
 use App\Services\CatalogService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CatalogController extends Controller
@@ -15,7 +14,7 @@ class CatalogController extends Controller
         private readonly CatalogService $catalogService,
     ) {}
 
-    public function __invoke(CatalogRequest $request): AnonymousResourceCollection|JsonResponse
+    public function __invoke(CatalogRequest $request): AnonymousResourceCollection
     {
         $currencyCode = strtolower((string) $request->route('currency'));
 

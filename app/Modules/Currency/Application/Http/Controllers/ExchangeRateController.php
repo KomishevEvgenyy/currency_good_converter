@@ -3,7 +3,6 @@
 namespace Modules\Currency\Application\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use Modules\Currency\Application\Facades\CurrencyExchangeFacade;
 use Modules\Currency\Application\Http\Requests\ExchangeRateRequest;
 use Modules\Currency\Application\Http\Resources\CurrencyRateResource;
@@ -14,7 +13,7 @@ class ExchangeRateController extends Controller
         private readonly CurrencyExchangeFacade $currencyExchange,
     ) {}
 
-    public function __invoke(ExchangeRateRequest $request): JsonResponse|CurrencyRateResource
+    public function __invoke(ExchangeRateRequest $request): CurrencyRateResource
     {
         $code = (string) $request->route('currency');
         $rate = $this->currencyExchange->getRateByCode($code);
