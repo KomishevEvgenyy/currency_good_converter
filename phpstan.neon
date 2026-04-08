@@ -1,0 +1,32 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - app
+        - app/Modules
+
+    excludePaths:
+        analyse:
+            - vendor/*
+            - storage/*
+            - bootstrap/cache/*
+
+    tmpDir: storage/phpstan
+
+    checkUninitializedProperties: true
+    reportMaybesInMethodSignatures: true
+    reportMaybesInPropertyPhpDocTypes: true
+    reportStaticMethodSignatures: true
+    reportWrongPhpDocTypeInVarTag: true
+
+    treatPhpDocTypesAsCertain: false
+    universalObjectCratesClasses:
+        - stdClass
+
+    parallel:
+        maximumNumberOfProcesses: 4
+
+    ignoreErrors: []

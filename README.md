@@ -196,6 +196,16 @@ make artisan migrate
 make artisan test
 ```
 
+### Run static analysis
+```bash
+make phpstan
+```
+
+If `larastan` is not installed yet, add it first:
+```bash
+docker compose exec laravel.test composer require --dev nunomaduro/larastan
+```
+
 
 ## API
 
@@ -248,6 +258,22 @@ make test
 ```
 
 Tests use `Http::fake()` to mock external API calls (DummyJSON and NBU), so no network access is needed.
+
+## Static Analysis
+
+PHPStan is configured via [phpstan.neon](phpstan.neon) at level 6 and analyzes both the standard Laravel app code and the custom currency module under `app/Modules`.
+
+Run it with:
+
+```bash
+make phpstan
+```
+
+For Laravel-aware analysis, install Larastan:
+
+```bash
+docker compose exec laravel.test composer require --dev nunomaduro/larastan
+```
 
 ### Test Coverage
 

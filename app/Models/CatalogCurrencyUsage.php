@@ -14,7 +14,7 @@ class CatalogCurrencyUsage extends Model
     public $timestamps = false;
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'currency_code',

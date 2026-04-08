@@ -8,6 +8,9 @@ use Illuminate\Validation\Rule;
 
 class CatalogRequest extends FormRequest
 {
+    /**
+     * @return array<string, array<int, \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Validation\Rules\In|string>>
+     */
     public function rules(): array
     {
         return [
@@ -15,6 +18,9 @@ class CatalogRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function validationData(): array
     {
         return array_merge(parent::validationData(), [

@@ -12,6 +12,9 @@ final readonly class CatalogService
         private CurrencyExchangeFacade $currencyExchange,
     ) {}
 
+    /**
+     * @return Collection<int, object{id: int, title: string, price: float, rating: float, thumbnail: string}&\stdClass>
+     */
     public function getProducts(string $currencyCode): Collection
     {
         $response = Http::connectTimeout((int) config('catalog.http.connect_timeout_seconds', 3))
@@ -21,7 +24,10 @@ final readonly class CatalogService
             ])
             ->throw();
 
-        return collect($response->json('products', []))->map(function (array $product) use ($currencyCode): object {
+        /** @var list<array{id: int, title: string, price: numeric, rating: numeric, thumbnail: string}> $products */
+        $products = $response->json('products', []);
+
+        return collect($products)->map(function (array $product) use ($currencyCode): object {
             $price = $this->currencyExchange->catalogPriceInCurrency(
                 (float) $product['price'],
                 $currencyCode,
@@ -31,7 +37,7 @@ final readonly class CatalogService
                 'id' => $product['id'],
                 'title' => $product['title'],
                 'price' => $price,
-                'rating' => $product['rating'],
+                'rating' => (float) $product['rating'],
                 'thumbnail' => $product['thumbnail'],
             ];
         });

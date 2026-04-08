@@ -4,7 +4,7 @@ COMPOSE := docker compose
 APP_SERVICE := laravel.test
 WORKER_SERVICE := queue-worker
 
-.PHONY: help up down build restart logs ps shell composer artisan npm test setup clean install
+.PHONY: help up down build restart logs ps shell composer artisan npm test phpstan setup clean install
 
 help:
 	@echo "Available targets:"
@@ -21,6 +21,7 @@ help:
 	@echo "  make artisan    - run artisan command in app container"
 	@echo "  make npm        - run npm command in app container"
 	@echo "  make test       - run tests in app container"
+	@echo "  make phpstan    - run static analysis in app container"
 	@echo "  make clean      - stop containers and remove volumes"
 
 up:
@@ -62,6 +63,9 @@ npm:
 
 test:
 	$(COMPOSE) exec $(APP_SERVICE) php artisan test
+
+phpstan:
+	$(COMPOSE) exec $(APP_SERVICE) ./vendor/bin/phpstan analyse --configuration=phpstan.neon
 
 install:
 	$(COMPOSE) exec $(APP_SERVICE) composer install
