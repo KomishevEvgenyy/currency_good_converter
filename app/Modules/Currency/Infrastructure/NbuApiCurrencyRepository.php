@@ -4,12 +4,15 @@ namespace Modules\Currency\Infrastructure;
 
 use Illuminate\Support\Facades\Http;
 use Modules\Currency\Domain\Contracts\CurrencyRateReader;
-use Modules\Currency\Domain\CurrencyRate;
 
 readonly class NbuApiCurrencyRepository implements CurrencyRateReader
 {
+    public function __construct(
+        private NbuCurrencyRateResponseMapper $mapper,
+    ) {}
+
     /**
-     * @return CurrencyRate[]
+     * @return \Modules\Currency\Domain\CurrencyRate[]
      */
     public function getAll(): array
     {
@@ -19,14 +22,6 @@ readonly class NbuApiCurrencyRepository implements CurrencyRateReader
             ->get(config('currency.urls.nbu'), ['json' => ''])
             ->throw();
 
-        return array_map(
-            fn (array $item) => new CurrencyRate(
-                name: $item['txt'],
-                rate: (float) $item['rate'],
-                currencyCode: $item['cc'],
-                exchangeDate: $item['exchangedate'],
-            ),
-            $response->json(),
-        );
+        return $this->mapper->map($response->json());
     }
 }
